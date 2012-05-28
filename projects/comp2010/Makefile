@@ -14,4 +14,4 @@ SOURCE = auton.c   \
 
 CFLAGS = -DROBOT_$(ROBOT)
 
-include ../build.mk
+include ../../build.mk
