@@ -50,7 +50,7 @@ static char *get_stack_top(void)
 #define DEBUG
 #ifdef DEBUG
 /* buf must be 32 / 4 = 8 bytes in length */
-#define H32(i) (buf[i] = map[(q & (0xF << (32 / 4 - i)))] >> (32/4 - i))
+#define H32(i) buf[i] = map[(q & (0xF << (32 / 4 - i))) >> (32/4 - i)]
 void put_hex32(char *buf, uint32_t q)
 {
 	const char *map = "0123456789ABCDEF";
@@ -122,7 +122,19 @@ int _read(int __unused fd, char __unused *ptr, int __unused len)
 	return 0;
 }
 
+int _kill(pid_t __unused pid, int __unused sig)
+{
+	return 0;
+}
 
+static char const exit_msg[] = "\nEXIT\n";
+static size_t const emsg_len = sizeof(exit_msg) - 1;
+void _exit(int __unused status)
+{
+	_write(1, exit_msg, emsg_len);
+	for(;;)
+		;
+}
 
 // 1 means we are connected to a term.
 // 0 means not ^.

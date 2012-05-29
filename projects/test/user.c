@@ -75,60 +75,31 @@ void auton_spin(void) {}
 void telop_spin(void) {}
 void disable_spin(void) {}
 
-/* Count encoder ticks using interrupts. Note that any variables being modified
- * within an interrupt service routine must be flagged as volatile.
- */
-volatile int32_t left  = 0;
-volatile int32_t right = 0;
+/* Count encoder ticks using interrupts.  */
+int32_t left  = 0;
+int32_t right = 0;
+
+#define ENC(this, dig, other_ix, var) do {			\
+	bool const other = digital_get(IX_INTERRUPT(other_ix));	\
+	if (this ^ other ^ dig) {				\
+		(var)++;					\
+	} else {						\
+		(var)--;					\
+	}							\
+} while(0)
 
 void enc_left_a(bool dig) {
-	bool const other = digital_get(IX_INTERRUPT(2));
-
-	if (dig && other)
-		--left;
-	else if (dig && !other)
-		++left;
-	else if (!dig && other)
-		++left;
-	else
-		--left;
+	ENC(0, dig, 2, left);
 }
 
 void enc_left_b(bool dig) {
-	bool const other = digital_get(IX_INTERRUPT(1));
-
-	if (dig && other)
-		--left;
-	else if (dig && !other)
-		++left;
-	else if (!dig && other)
-		++left;
-	else
-		--left;
+	ENC(1, dig, 1, left);
 }
 
 void enc_right_a(bool dig) {
-	bool const other = digital_get(IX_INTERRUPT(4));
-
-	if (dig && other)
-		--right;
-	else if (dig && !other)
-		++right;
-	else if (!dig && other)
-		++right;
-	else
-		--right;
+	ENC(0, dig, 4, right);
 }
 
 void enc_right_b(bool dig) {
-	bool const other = digital_get(IX_INTERRUPT(3));
-
-	if (dig && other)
-		--right;
-	else if (dig && !other)
-		++right;
-	else if (!dig && other)
-		++right;
-	else
-		--right;
+	ENC(1, dig, 3, right);
 }

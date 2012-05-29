@@ -3,7 +3,7 @@ CC = sdcc
 AS = gpasm
 LD = $(CC)
 
-SOURCE += $(ARCHDIR)/crt0iz_sdcc.c		\
+SRC += $(ARCHDIR)/crt0iz_sdcc.c		\
           $(ARCHDIR)/spi_open.c		\
           $(ARCHDIR)/ifi_util_sdcc.asm
 
@@ -13,19 +13,21 @@ ARCH_CFLAGS += -I$(ARCHDIR)/h
 ARCH_CFLAGS += -I. -DARCH_PIC
 ARCH_CFLAGS += --ivt-loc=0x800 --no-crt
 ARCH_CFLAGS += --optimize-cmp
-ARCH_CFLAGS += --optimize-df
+ARCH_CFLAGS += --optimize-df -V
 #ARCH_CFLAGS += --pstack-model=large
 
-ARCH_LDFLAGS = -Wl,-s,/$(ARCHDIR)/18f8520user_sdcc.lkr $(ARCH_CFLAGS)
+ARCH_LDFLAGS = -Wl,-s,$(ARCHDIR)/18f8520user_sdcc.lkr -llibio18f8520.lib \
+	       -llibc18f.lib $(ARCH_CFLAGS) 
 ARCH_ASFLAGS = -p18f8520
 
-OBJECTS = $(SOURCE:=.o)
-#TRASH       += 
+OBJ = $(SRC:=.o)
+TRASH  += $(SRC:=.lst) \
+	  $(SRC:=.asm)
 
 .PHONY: clean
 clean :
 	@echo "CLEAN"
-	@$(RM) $(OBJECTS) $(TARGET) $(TRASH)
+	@$(RM) $(OBJ) $(TARGET) $(TRASH)
 
 .SECONDARY:
 
@@ -37,6 +39,6 @@ clean :
 	@echo "AS $(@F)"
 	@$(AS) $(ALL_ASFLAGS) -c -o $@ $<
 
-%.hex : $(OBJECTS)
+%.hex : $(OBJ)
 	@echo "LD $(@F)"
 	@$(LD) $(ALL_LDFLAGS) -o $@ $^

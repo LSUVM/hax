@@ -3,7 +3,7 @@ LD           = '$(MCCPATH)/bin/mplink'
 AS           = '$(MCCPATH)/mpasm/mpasm'
 MD           = gcc
 
-SOURCE += $(ARCHDIR)/c018iz_mcc18.c \
+SRC += $(ARCHDIR)/c018iz_mcc18.c \
 	  $(ARCHDIR)/ifi_util_mcc18.asm
 
 MCCPATH      = /opt/mcc18
@@ -22,23 +22,23 @@ ARCH_CFLAGS  = -I=$(WICPATH) -I=$(WIPATH) -I=$(srcdir) -I=$(WIAPATH)   \
 ARCH_ASFLAGS = /p18f8520
 ARCH_LDFLAGS = $(ARCHDIR)/18f8520user_mcc18.lkr /l $(WLIBPATH) /a INHX32
 
-OBJECTS     += $(SOURCE:=.o)
+OBJ     += $(SRC:=.o)
 TRASH       += $(TARGET:.hex=.cod) \
                $(TARGET:.hex=.lst) \
-               $(OBJECTS:.o=.err)  \
-               $(OBJECTS:.o=.d)
+               $(OBJ:.o=.err)  \
+               $(OBJ:.o=.d)
 
 .PHONY : clean
 .SECONDARY:
 clean :
 	@echo "CLEAN"
-	@$(RM) $(OBJECTS) $(TARGET) $(TRASH)
+	@$(RM) $(OBJ) $(TARGET) $(TRASH)
 
-%.hex : $(OBJECTS)
+%.hex : $(OBJ)
 	@echo "LD $(@F)"
 	@$(LD) $(ALL_LDFLAGS) $^ /o$@ /m$(@:.hex=.map)
 
-#-include $(OBJECTS:.o=.d)
+#-include $(OBJ:.o=.d)
 
 %.c.o : %.c
 	@echo "CC $(@F)"

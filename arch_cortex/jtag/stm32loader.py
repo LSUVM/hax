@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# -*- coding: utf-8 -*-
-# vim: sw=4:ts=4:si:et:enc=utf-8
+# vim: sw=4:ts=4:si:et
 
 # Author: Ivan A-R <ivan@tuxotronic.org>
 # Project page: http://tuxotronic.org/wiki/projects/stm32loader

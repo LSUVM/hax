@@ -14,43 +14,81 @@
 #define CS_HSE 0
 #define CS_HSI 1
 static int rcc_src_hclk;
+static int treg_div;
+static int treg_max;
 
+/* 1 jiffie per 1us */
 static volatile uint64_t jiffies;
 
-#define jiffies_to_ms(jiffies) ((jiffies)/2)
+#define treg_to_us(treg) ((treg_max - (treg)) / treg_div)
+#define jiffies_to_ms(jiffies) (jiffies / 1000)
+#define jiffies_to_us(jiffies) (jiffies)
 
-/* acuracy is +- the size of a single clock tick. */
-void udelay_500(void) {
-	uint64_t target = jiffies + 1;
-	while (jiffies <= target)
-		;
-}
 
 uint64_t time_get_ms(void)
 {
 	return jiffies_to_ms(jiffies);
 }
 
+/* 0 to 999 (1000) */
+uint16_t time_get_only_us(void)
+{
+	return treg_to_us(SysTick->VAL);
+}
+
+/* this seems like it would be slightly inefficient in some cases */
+uint64_t time_get_us(void)
+{
+	uint64_t treg = treg_to_us(SysTick->VAL);
+	uint64_t jiff = jiffies_to_us(jiffies);
+
+	return jiff | treg;
+}
+
+/* acuracy is +- the size of systick's prescaled clock speed with sub us
+ * times discarded:
+ *
+ * 72 * 1000 * 1000 / 8 / 9 = 1us
+ * 64 * 1000 * 1000 / 8 / 8 = 1us */
+#include <stdio.h>
+#include <inttypes.h>
+void udelay(uint32_t delay_us)
+{
+	uint64_t t_now = time_get_us();
+	uint64_t t_later = t_now + delay_us;
+	printf("now: %"PRIu32" delay: %"PRIu32" later: %"PRIu32"\n",
+			(uint32_t)t_now, (uint32_t)delay_us, (uint32_t)t_later);
+	while ((t_now = time_get_us()) <= t_later) {
+		printf("now: %"PRIu32" later: %"PRIu32"\n",
+				(uint32_t)t_now, (uint32_t)t_later);
+	}
+
+	puts("AFTER");
+}
+
 __attribute__((interrupt))
 void SysTick_Handler(void)
 {
-	jiffies++;
+	jiffies += 1000;
 }
 
 /**
- * systick_setup - initialize the systick subsystem with a 500us period
- *	 72 * 1000 * 1000 / 8 / 4500 = 2000
- *	 64 * 1000 * 1000 / 8 / 4000 = 2000
+ * systick_setup - initialize the systick subsystem with a 1ms period
+ *	 72 * 1000 * 1000 / 8 / 9000 = 1000
+ *	 64 * 1000 * 1000 / 8 / 8000 = 1000
  */
 static void systick_setup(void)
 {
 	SysTick->CTRL = 0;
 
 	if (rcc_src_hclk == CS_HSE) {
-		SysTick->LOAD = 4500;
+		treg_div = 9;
 	} else if (rcc_src_hclk == CS_HSI) {
-		SysTick->LOAD = 4000;
+		treg_div = 8;
 	}
+
+	treg_max = treg_div * 1000;
+	SysTick->LOAD = treg_max;
 
 	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk
 		| SysTick_CTRL_TICKINT_Msk

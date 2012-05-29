@@ -3,7 +3,7 @@ SRC_STM_LIB = $(ARCHDIR)/lib/startup/startup_stm32f10x_hd.s \
               $(wildcard $(FWLIB_DIR)/src/*.c)
 SRC_PRINTF  = $(wildcard $(ARCHDIR)/lib/small_printf/*.c)
 
-SOURCE  += $(ARCHDIR)/hax.c          \
+SRC  += $(ARCHDIR)/hax.c          \
            $(ARCHDIR)/clocks.c       \
            $(ARCHDIR)/spi.c          \
            $(ARCHDIR)/init.c         \
