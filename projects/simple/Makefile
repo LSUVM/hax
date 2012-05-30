@@ -1,6 +1,6 @@
 arch     = cortex
 prog     = simple
 serial   = /dev/ttyUSB0
-SOURCE   = main.c
+SRC      = main.c
 
-include ../build.mk
+include ../../build.mk

@@ -1,5 +1,5 @@
 arch     = pic
 prog     = skel
-SOURCE   = main.c user.c
+SRC      = main.c user.c
 
 include ../../build.mk

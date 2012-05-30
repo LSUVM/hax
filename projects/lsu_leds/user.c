@@ -13,15 +13,11 @@ void usart1_puts(const char *c);
 void init(void) {
 	usart1_puts("INIT\n");
 
-	digital_setup(IX_DIGITAL(1), DIGITAL_OUT); // White
-	digital_setup(IX_DIGITAL(3), DIGITAL_OUT); // Green
-	digital_setup(IX_DIGITAL(5), DIGITAL_OUT); // Yellow
-	digital_setup(IX_DIGITAL(7), DIGITAL_OUT); // Red
+	digital_setup(IX_DIGITAL(1), DIGITAL_OUT); 
+	digital_setup(IX_DIGITAL(3), DIGITAL_OUT); 
 
     digital_set(IX_DIGITAL(1), true);
     digital_set(IX_DIGITAL(3), true);
-    digital_set(IX_DIGITAL(5), true);
-    digital_set(IX_DIGITAL(7), true);
 }
 
 /* Called every time the user processor receives data from the master processor
@@ -29,11 +25,6 @@ void init(void) {
  */
 void auton_loop(void) {
 	usart1_puts("AUTON LOOP\n");
-
-    digital_set(IX_DIGITAL(1), true);
-    digital_set(IX_DIGITAL(3), true);
-    digital_set(IX_DIGITAL(5), true);
-    digital_set(IX_DIGITAL(7), true);
 }
 
 /* Same as auton_loop(), except in user controlled mode. This is controlled by
@@ -41,11 +32,6 @@ void auton_loop(void) {
  */
 void telop_loop(void) {
 	usart1_puts("TELOP LOOP\n");
-
-    digital_set(IX_DIGITAL(1), true);
-    digital_set(IX_DIGITAL(3), true);
-    digital_set(IX_DIGITAL(5), true);
-    digital_set(IX_DIGITAL(7), true);
 }
 
 /* Same as auton_loop() and telop_loop(), except in disabled mode. This is 
